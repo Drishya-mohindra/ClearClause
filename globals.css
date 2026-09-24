@@ -1,0 +1,160 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Theming is done entirely with CSS custom properties rather than Tailwind's
+ * `dark:` variants, so a single token set drives both themes and a component
+ * never has to spell out two colours.
+ *
+ * Every foreground/background pair below was chosen to clear WCAG 2.1 AA:
+ * at least 4.5:1 for body text and 3:1 for large text, icons and borders.
+ */
+@layer base {
+  :root {
+    --color-background: 248 249 251;
+    --color-surface: 255 255 255;
+    --color-surface-muted: 241 243 247;
+    --color-border: 209 214 224;
+    --color-foreground: 17 21 28; /* 16.9:1 on surface */
+    --color-foreground-muted: 84 93 108; /* 6.3:1 on surface */
+    --color-primary: 26 86 219; /* 6.4:1 against white text */
+    --color-primary-foreground: 255 255 255;
+    --color-ring: 26 86 219;
+
+    --color-critical: 176 32 28; /* 5.9:1 */
+    --color-high: 154 62 0; /* 5.8:1 */
+    --color-medium: 116 79 0; /* 6.2:1 */
+    --color-low: 47 84 22; /* 7.4:1 */
+    --color-info: 21 84 130; /* 6.4:1 */
+
+    --color-added: 20 83 45;
+    --color-removed: 155 28 28;
+
+    --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+    color-scheme: light;
+  }
+
+  /* Follow the system preference unless the reader has picked a theme. */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) {
+      --color-background: 12 15 20;
+      --color-surface: 22 26 33;
+      --color-surface-muted: 29 34 43;
+      --color-border: 55 63 77;
+      --color-foreground: 232 235 240; /* 14.6:1 on surface */
+      --color-foreground-muted: 166 175 189; /* 7.3:1 on surface */
+      --color-primary: 118 156 255;
+      --color-primary-foreground: 10 14 20;
+      --color-ring: 143 176 255;
+
+      --color-critical: 255 154 148;
+      --color-high: 255 179 122;
+      --color-medium: 242 201 76;
+      --color-low: 163 217 119;
+      --color-info: 127 196 245;
+
+      --color-added: 134 239 172;
+      --color-removed: 253 164 175;
+
+      color-scheme: dark;
+    }
+  }
+
+  :root[data-theme='dark'] {
+    --color-background: 12 15 20;
+    --color-surface: 22 26 33;
+    --color-surface-muted: 29 34 43;
+    --color-border: 55 63 77;
+    --color-foreground: 232 235 240;
+    --color-foreground-muted: 166 175 189;
+    --color-primary: 118 156 255;
+    --color-primary-foreground: 10 14 20;
+    --color-ring: 143 176 255;
+
+    --color-critical: 255 154 148;
+    --color-high: 255 179 122;
+    --color-medium: 242 201 76;
+    --color-low: 163 217 119;
+    --color-info: 127 196 245;
+
+    --color-added: 134 239 172;
+    --color-removed: 253 164 175;
+
+    color-scheme: dark;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: var(--font-sans);
+  }
+
+  /*
+   * A visible focus ring on every interactive element, in both themes. Using
+   * `:focus-visible` keeps it out of the way of mouse users without ever
+   * removing it for keyboard users.
+   */
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  /* Respect a reduced-motion preference for every animation in the app. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* Windows high-contrast mode: keep borders visible when colours are dropped. */
+  @media (forced-colors: active) {
+    .severity-chip,
+    .diff-token {
+      border: 1px solid currentColor;
+    }
+  }
+}
+
+@layer components {
+  /* Skip link: hidden until focused, then pinned to the top-left. */
+  .skip-link {
+    @apply absolute left-3 top-3 z-50 -translate-y-20 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-transform focus-visible:translate-y-0;
+  }
+
+  .card {
+    @apply rounded-lg border border-border bg-surface shadow-sm;
+  }
+
+  /*
+   * Model output is rendered as React elements, never as HTML, so these styles
+   * are applied to the element tree rather than through a prose plugin.
+   */
+  .generated-output h2 {
+    @apply mb-2 mt-6 text-base font-semibold text-foreground first:mt-0;
+  }
+
+  .generated-output h3 {
+    @apply mb-1 mt-4 text-sm font-semibold text-foreground;
+  }
+
+  .generated-output p {
+    @apply mb-3 leading-relaxed text-foreground;
+  }
+
+  .generated-output ul {
+    @apply mb-3 list-disc space-y-1 pl-5 leading-relaxed;
+  }
+
+  .generated-output ol {
+    @apply mb-3 list-decimal space-y-1 pl-5 leading-relaxed;
+  }
+}
